@@ -1,4 +1,4 @@
-source ./prometheus_install.sh
+source ./src/prometheus_install.sh
 # 主菜单
 function main_menu() {
     while true; do
