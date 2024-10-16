@@ -33,7 +33,7 @@ function install_prometheus() {
 
     echo "正在检查是否已安装 Prometheus ..."
     if command -v prometheus &> /dev/null; then
-        echo "Prometheus 已安装。"
+        echo "Prometheus 已安装。退出。"
         exit 1
     fi
 
@@ -79,6 +79,7 @@ function install_prometheus() {
 
     echo "创建数据目录 ${tsdb_path} ..."
     mkdir -p ${tsdb_path}
+    chown -R prometheus.prometheus ${tsdb_path}
 
     echo "生成systemctl 配置文件 ..."
     cat <<EOF > ${systemctl_path}
@@ -99,11 +100,13 @@ ExecStart=${binary_path}/prometheus \
     --web.listen-address=127.0.0.1:9090 \
     --web.enable-lifecycle \
     --web.enable-admin-api \
-    --web.console-libraries=${lib_path}/console_libraries \
-    --web.console-templates=${lib_path}/consoles \
+    --web.console.libraries=${lib_path}/console_libraries \
+    --web.console.templates=${lib_path}/consoles \
     --log.level=info \
     --storage.tsdb.path=${tsdb_path} \
     --storage.tsdb.retention.time=30d \
+    --storage.tsdb.retention.size=30MB \
+    --query.timeout=1m
 
 ExecReload=/bin/curl -X POST http://localhost:9090/-/reload
 TimeoutStopSec=10s
@@ -116,7 +119,9 @@ EOF
     systemctl daemon-reload
     systemctl enable prometheus --now
 
-    echo "Prometheus 安装完成。"
+    systemctl --no-pager status prometheus
+
+    echo "Prometheus 安装完成。 verison: ${latest_release}"
 }
 
 
