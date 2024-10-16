@@ -177,7 +177,7 @@ function main_menu() {
         clear
         
         echo "退出脚本，请按ctrl c退出即可"
-        echo "请选择要执行的操作:"
+        echo "请选择要执行的操作:"`
         echo "1. 安装prometheus最新release"
         echo "2. 安装prometheus从本地文件"
         # echo "2. 安装alertmanager"
