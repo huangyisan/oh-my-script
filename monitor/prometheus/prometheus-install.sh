@@ -1,0 +1,148 @@
+#!/bin/bash
+
+# 检查是否以root用户运行脚本
+if [ "$(id -u)" != "0" ]; then
+    echo "此脚本需要以root用户权限运行。"
+    echo "请尝试使用 'sudo -i' 命令切换到root用户，然后再次运行此脚本。"
+    exit 1
+fi
+
+# 检查是否为 Ubuntu 系统
+cat /etc/os-release | grep -q "Ubuntu"
+if [ $? -ne 0 ]; then
+    echo "此脚本仅支持 Ubuntu 系统。"
+    exit 1
+fi
+
+# 检查是否为x64系统
+if [ "$(uname -m)" != "x86_64" ]; then
+    echo "此脚本仅支持x64系统。"
+    exit 1
+fi
+
+# prometheus env
+binary_path="/usr/local/sbin"
+config_path="/etc/prometheus"
+lib_path="/var/lib/prometheus"
+systemctl_path="/etc/systemd/system/prometheus.service"
+exec_user="prometheus"
+tsdb_path="/data/prometheus"
+
+
+function install_prometheus() {
+
+    echo "正在检查是否已安装 Prometheus ..."
+    if command -v prometheus &> /dev/null; then
+        echo "Prometheus 已安装。"
+        exit 1
+    fi
+
+    echo "正在创建 ${exec_user} 用户 ..."
+    useradd -s /sbin/nologin ${exec_user}
+
+    echo "获取最新release 版本信息 ..."
+    latest_release=$(curl -s https://api.github.com/repos/prometheus/prometheus/releases/latest | grep "tag_name" | cut -d : -f 2 | tr -d "\" , ")
+
+    # 检查是否获取到最新版本信息
+    if [ -z "$latest_release" ]; then
+        echo "无法获取最新版本信息。"
+        exit 1
+    fi
+
+    echo "正在下载最新版本 $latest_release ..."
+    download_url=$(curl -s https://api.github.com/repos/prometheus/prometheus/releases/latest | grep "browser_download_url" | grep "linux-amd64" | grep -P -o "https.+" | sed 's/.$//')
+    file_name=$(echo $download_url | awk -F '/' '{print $NF}')
+    file_name_without_suffix=$(echo $file_name | sed 's/\.tar.gz//')
+
+    curl -L -o ${file_name} ${download_url}
+
+    echo "开始解压，并安装 ..."
+    # tar 解压为prometheus
+    
+    tar zxf ${file_name}
+    cd ${file_name_without_suffix}
+    
+    echo "复制二进制文件到 ${binary_path} ..."
+    /usr/bin/cp -a promtool prometheus ${binary_path}
+    chown -R prometheus.prometheus ${binary_path}/prometheus
+    chown -R prometheus.prometheus ${binary_path}/promtool
+
+    echo "复制静态资源到 ${lib_path} ..."
+    mkdir -p ${lib_path}
+    /usr/bin/cp -a console_libraries consoles ${lib_path}
+    chown -R prometheus.prometheus ${lib_path}
+
+    echo "复制配置文件到${config_path} ..."
+    mkdir -p ${config_path}
+    /usr/bin/cp -a prometheus.yml ${config_path}/prometheus.yml
+    chown -R prometheus.prometheus ${config_path}/prometheus.yml
+
+    echo "创建数据目录 ${tsdb_path} ..."
+    mkdir -p ${tsdb_path}
+
+    echo "生成systemctl 配置文件 ..."
+    cat <<EOF > ${systemctl_path}
+[Unit]
+Description=Prometheus
+Documentation=https://prometheus.io/
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+LimitNOFILE=65536
+User=${exec_user}
+Group=${exec_user}
+Type=simple
+ExecStartPre=${binary_path}/promtool check config ${config_path}/prometheus.yml
+ExecStart=${binary_path}/prometheus \
+    --config.file=${config_path}/prometheus.yml \
+    --web.listen-address=127.0.0.1:9090 \
+    --web.enable-lifecycle \
+    --web.enable-admin-api \
+    --web.console-libraries=${lib_path}/console_libraries \
+    --web.console-templates=${lib_path}/consoles \
+    --log.level=info \
+    --storage.tsdb.path=${tsdb_path} \
+    --storage.tsdb.retention.time=30d \
+
+ExecReload=/bin/curl -X POST http://localhost:9090/-/reload
+TimeoutStopSec=10s
+Restart=always
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    echo "正在启动 Prometheus 服务 ..."
+    systemctl daemon-reload
+    systemctl enable prometheus --now
+
+    echo "Prometheus 安装完成。"
+}
+
+
+# 主菜单
+function main_menu() {
+    while true; do
+        clear
+        
+        echo "退出脚本，请按ctrl c退出即可"
+        echo "请选择要执行的操作:"
+        echo "1. 安装prometheus"
+        echo "2. 安装alertmanager"
+        echo "3. 安装node_exporter"
+        read -p "请输入选项（1-3）: " OPTION
+
+        case $OPTION in
+        1) install_prometheus ;;
+        2) install_alertmanager ;;
+        3) install_node_exporter ;;
+        *) echo "无效选项。" ;;
+        esac
+        echo "按任意键返回主菜单..."
+        read -n 1
+    done
+
+}
+
+# 显示主菜单
+main_menu
