@@ -28,18 +28,20 @@ systemctl_path="/etc/systemd/system/prometheus.service"
 exec_user="prometheus"
 tsdb_path="/data/prometheus"
 
-
-function install_prometheus() {
-
+function _check_prometheus_local() {
     echo "正在检查是否已安装 Prometheus ..."
     if command -v prometheus &> /dev/null; then
         echo "Prometheus 已安装。退出。"
         exit 1
     fi
+}
 
+function _create_prometheus_user() {
     echo "正在创建 ${exec_user} 用户 ..."
     useradd -s /sbin/nologin ${exec_user}
+}
 
+function _download_latest_prometheus() {
     echo "获取最新release 版本信息 ..."
     latest_release=$(curl -s https://api.github.com/repos/prometheus/prometheus/releases/latest | grep "tag_name" | cut -d : -f 2 | tr -d "\" , ")
 
@@ -53,11 +55,15 @@ function install_prometheus() {
     download_url=$(curl -s https://api.github.com/repos/prometheus/prometheus/releases/latest | grep "browser_download_url" | grep "linux-amd64" | grep -P -o "https.+" | sed 's/.$//')
     file_name=$(echo $download_url | awk -F '/' '{print $NF}')
     file_name_without_suffix=$(echo $file_name | sed 's/\.tar.gz//')
+    curl --connect-timeout 30 --max-time 30 -L -o ${file_name} ${download_url}
+    if [ $? -ne 0 ]; then
+        echo "下载文件失败。"
+        exit 1
+    fi
+}
 
-    curl -L -o ${file_name} ${download_url}
-
+function _install_prometheus() {
     echo "开始解压，并安装 ..."
-    # tar 解压为prometheus
     
     tar zxf ${file_name}
     cd ${file_name_without_suffix}
@@ -80,7 +86,9 @@ function install_prometheus() {
     echo "创建数据目录 ${tsdb_path} ..."
     mkdir -p ${tsdb_path}
     chown -R prometheus.prometheus ${tsdb_path}
+}
 
+function _create_systemctl_config() {
     echo "生成systemctl 配置文件 ..."
     cat <<EOF > ${systemctl_path}
 [Unit]
@@ -114,14 +122,52 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 EOF
+}
 
+function _start_prometheus() {
     echo "正在启动 Prometheus 服务 ..."
     systemctl daemon-reload
     systemctl enable prometheus --now
-
     systemctl --no-pager status prometheus
+    echo "Prometheus 安装完成。"
+}
 
-    echo "Prometheus 安装完成。 verison: ${latest_release}"
+
+function install_prometheus() {
+    _check_prometheus_local
+    _create_prometheus_user
+    _download_latest_prometheus
+    _install_prometheus
+    _create_systemctl_config
+    _start_prometheus   
+}
+
+# 指定本地文件
+function _specify_local_file() {
+    # 控制台输入文件名
+    read -p "请输入文件名(tar.gz包)：" file_name
+    if [ -z "$file_name" ]; then
+        echo "文件名不能为空。"
+        return 1
+    fi
+    #检查当前目录是否存在文件
+    if [ ! -f "$file_name" ]; then
+        echo "文件不存在。"
+        return 1
+    fi
+    file_name_without_suffix=$(echo $file_name | sed 's/\.tar.gz//')
+
+}
+
+function install_prometheus_local() {
+    _check_prometheus_local
+    _create_prometheus_user
+    if ! _specify_local_file; then  # 检查返回值
+        return  # 如果失败，返回到主菜单
+    fi
+    _install_prometheus
+    _create_systemctl_config
+    _start_prometheus  
 }
 
 
@@ -132,15 +178,17 @@ function main_menu() {
         
         echo "退出脚本，请按ctrl c退出即可"
         echo "请选择要执行的操作:"
-        echo "1. 安装prometheus"
-        echo "2. 安装alertmanager"
-        echo "3. 安装node_exporter"
+        echo "1. 安装prometheus最新release"
+        echo "2. 安装prometheus从本地文件"
+        # echo "2. 安装alertmanager"
+        # echo "3. 安装node_exporter"
         read -p "请输入选项（1-3）: " OPTION
 
         case $OPTION in
         1) install_prometheus ;;
-        2) install_alertmanager ;;
-        3) install_node_exporter ;;
+        2) install_prometheus_local ;;
+        # 3) install_alertmanager ;;
+        # 4) install_node_exporter ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
