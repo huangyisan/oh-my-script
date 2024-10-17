@@ -6,6 +6,7 @@ tsdb_path="/data/prometheus"
 systemctl_path="/etc/systemd/system/thanos-sidecar.service"
 exec_user="prometheus"
 thanos_component_name="thanos-sidecar"
+objstore_config_path="/etc/thanos"
 
 function _check_thanos_sidecar_local() {
     echo "正在检查是否已安装 ${thanos_component_name} ..."
@@ -44,6 +45,9 @@ function _download_latest_thanos_sidecar() {
 function _install_thanos_sidecar() {
     echo "开始解压，并安装 ..."
 
+    mkdir -p ${objstore_config_path}
+    chown -R ${exec_user}.${exec_user} ${objstore_config_path}
+
     tar zxf ${file_name}
     file_path=$(echo ${file_name_without_suffix} | awk -F '/' '{print $NF}')
     cd ${file_path}
@@ -71,7 +75,8 @@ ExecStart=${binary_path}/${thanos_component_name} sidecar \
     --prometheus.url=http://127.0.0.1:9090 \
     --tsdb.path=${tsdb_path} \
     --http-address=127.0.0.1:10901 \
-    --grpc-address=127.0.0.1:10902
+    --grpc-address=127.0.0.1:10902 \
+    --objstore.config-file=${objstore_config_path}/thanos-alioss.yml
 ExecReload=/bin/kill -HUP $MAINPID
 TimeoutStopSec=10s
 Restart=always

@@ -95,6 +95,8 @@ ExecStart=${binary_path}/prometheus \
     --storage.tsdb.path=${tsdb_path} \
     --storage.tsdb.retention.time=30d \
     --storage.tsdb.retention.size=30MB \
+    --storage.tsdb.min-block-duration=2h \
+    --storage.tsdb.max-block-duration=2h \
     --query.timeout=1m
 
 ExecReload=/bin/curl -X POST http://localhost:9090/-/reload
