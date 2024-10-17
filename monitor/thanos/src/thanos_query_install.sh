@@ -90,7 +90,7 @@ function _start_thanos_query() {
     systemctl daemon-reload
     systemctl enable ${thanos_component_name} --now
     systemctl --no-pager status ${thanos_component_name}
-    echo "Thanos 安装完成。"
+    echo "${thanos_component_name} 安装完成。"
 }
 
 function _clean_tmp_file_path() {
