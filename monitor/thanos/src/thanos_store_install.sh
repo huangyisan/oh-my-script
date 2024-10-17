@@ -47,7 +47,9 @@ function _install_thanos_store() {
     echo "开始解压，并安装 ..."
 
     mkdir -p ${store_path}
+    chown -R ${exec_user}.${exec_user} ${store_path}
     mkdir -p ${objstore_config_path}
+    chown -R ${exec_user}.${exec_user} ${objstore_config_path}
 
     tar zxf ${file_name}
     file_path=$(echo ${file_name_without_suffix} | awk -F '/' '{print $NF}')
