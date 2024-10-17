@@ -3,11 +3,11 @@
 # thanos env
 binary_path="/usr/local/sbin"
 tsdb_path="/data/prometheus"
-systemctl_path="/etc/systemd/system/thanos-sidecar.service"
+systemctl_path="/etc/systemd/system/thanos-query.service"
 exec_user="prometheus"
-thanos_component_name="thanos-sidecar"
+thanos_component_name="thanos-query"
 
-function _check_thanos_sidecar_local() {
+function _check_thanos_query_local() {
     echo "正在检查是否已安装 ${thanos_component_name} ..."
     if command -v ${thanos_component_name} &>/dev/null; then
         echo "thanos 已安装。退出。"
@@ -41,7 +41,7 @@ function _download_latest_thanos() {
     fi
 }
 
-function _install_thanos_sidecar() {
+function _install_thanos_query() {
     echo "开始解压，并安装 ..."
 
     tar zxf ${file_name}
@@ -57,7 +57,7 @@ function _create_systemctl_config() {
     echo "生成systemctl 配置文件 ..."
     cat <<EOF >${systemctl_path}
 [Unit]
-Description=Thanos Sidecar
+Description=Thanos Query
 Documentation=https://thanos.io/
 Wants=network-online.target
 After=network-online.target
@@ -67,11 +67,18 @@ LimitNOFILE=65536
 User=${exec_user}
 Group=${exec_user}
 Type=simple
-ExecStart=${binary_path}/${thanos_component_name} sidecar \
+ExecStart=${binary_path}/${thanos_component_name} query \
     --prometheus.url=http://127.0.0.1:9090 \
     --tsdb.path=${tsdb_path} \
-    --http-address=127.0.0.1:10901 \
-    --grpc-address=127.0.0.1:10902
+    --http-address=127.0.0.1:10903 \
+    --grpc-address=127.0.0.1:10904 \
+    --store=sidecar01:10902 \
+    --store=sidecar02:10902 \
+    --query.timeout=5m \
+    --query.max-concurrent=300 \
+    --query.max-concurrent-select=50 \
+    --query.replica-label=replica
+
 ExecReload=/bin/kill -HUP
 TimeoutStopSec=10s
 Restart=always
@@ -80,19 +87,19 @@ WantedBy=multi-user.target
 EOF
 }
 
-function _start_thanos_sidecar() {
-    echo "正在启动 Thanos sidecar 服务 ..."
+function _start_thanos_query() {
+    echo "正在启动 Thanos query 服务 ..."
     systemctl daemon-reload
     systemctl enable ${thanos_component_name} --now
     systemctl --no-pager status ${thanos_component_name}
     echo "Thanos 安装完成。"
 }
 
-function install_thanos_sidecar() {
-    _check_thanos_sidecar_local
+function install_thanos_query() {
+    _check_thanos_query_local
     _create_thanos_user
     _download_latest_thanos
-    _install_thanos_sidecar
+    _install_thanos_query
     _create_systemctl_config
-    _start_thanos_sidecar
+    _start_thanos_query
 }
