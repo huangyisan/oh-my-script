@@ -1,6 +1,7 @@
 #!/bin.bash
-source ./src/prometheus_install.sh
-source ./src/node_exporter_install.sh
+source ./common/pre_check.sh
+source ./prometheus/src/prometheus_install.sh
+source ./prometheus/src/node_exporter_install.sh
 
 # github proxy
 function switch_github_proxy() {

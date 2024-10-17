@@ -1,5 +1,4 @@
 #!/bin/bash
-source ./common/pre_check.sh
 
 # prometheus env
 binary_path="/usr/local/sbin"

@@ -1,5 +1,4 @@
 #!/bin/bash
-source ./common/pre_check.sh
 
 # node_exporter env
 binary_path="/usr/local/sbin"
