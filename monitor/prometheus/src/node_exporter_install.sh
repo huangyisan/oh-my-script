@@ -71,7 +71,7 @@ ExecStart=${binary_path}/node_exporter \
     --collector.systemd \
     --collector.tcpstat
 
-ExecReload=/bin/kill -HUP
+ExecReload=/bin/kill -HUP $MAINPID
 TimeoutStopSec=10s
 Restart=always
 

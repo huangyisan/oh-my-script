@@ -77,7 +77,7 @@ ExecStart=${binary_path}/${thanos_component_name} query \
     --query.max-concurrent-select=50 \
     --query.replica-label=replica
 
-ExecReload=/bin/kill -HUP
+ExecReload=/bin/kill -HUP $MAINPID
 TimeoutStopSec=10s
 Restart=always
 [Install]

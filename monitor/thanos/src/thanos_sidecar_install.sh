@@ -72,7 +72,7 @@ ExecStart=${binary_path}/${thanos_component_name} sidecar \
     --tsdb.path=${tsdb_path} \
     --http-address=127.0.0.1:10901 \
     --grpc-address=127.0.0.1:10902
-ExecReload=/bin/kill -HUP
+ExecReload=/bin/kill -HUP $MAINPID
 TimeoutStopSec=10s
 Restart=always
 [Install]
