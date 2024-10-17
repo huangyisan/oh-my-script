@@ -5,6 +5,7 @@ source ./prometheus/src/prometheus_install.sh
 source ./prometheus/src/node_exporter_install.sh
 
 source ./thanos/src/thanos_sidecar_install.sh
+source ./thanos/src/thanos_query_install.sh
 
 # github proxy
 function switch_github_proxy() {
