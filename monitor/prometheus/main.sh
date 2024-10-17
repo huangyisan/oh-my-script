@@ -1,5 +1,6 @@
 #!/bin.bash
 source ./src/prometheus_install.sh
+source ./src/node_exporter_install.sh
 # 主菜单
 function main_menu() {
     while true; do
