@@ -1,3 +1,4 @@
+#!/bin.bash
 source ./src/prometheus_install.sh
 # 主菜单
 function main_menu() {
@@ -9,7 +10,7 @@ function main_menu() {
         echo "1. 安装prometheus最新release"
         echo "2. 安装prometheus从本地文件"
         # echo "2. 安装alertmanager"
-        # echo "3. 安装node_exporter"
+        echo "3. 安装node_exporter"
         read -p "请输入选项（1-3）: " OPTION
 
         case $OPTION in
