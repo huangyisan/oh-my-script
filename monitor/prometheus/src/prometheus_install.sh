@@ -51,18 +51,18 @@ function _install_prometheus() {
     cd ${file_path}
     
     echo "复制二进制文件到 ${binary_path} ..."
-    /usr/bin/cp -a promtool prometheus ${binary_path}
+    $(which cp) -a promtool prometheus ${binary_path}
     chown -R ${exec_user}.${exec_user} ${binary_path}/prometheus
     chown -R ${exec_user}.${exec_user} ${binary_path}/promtool
 
     echo "复制静态资源到 ${lib_path} ..."
     mkdir -p ${lib_path}
-    /usr/bin/cp -a console_libraries consoles ${lib_path}
+    $(which cp) -a console_libraries consoles ${lib_path}
     chown -R ${exec_user}.${exec_user} ${lib_path}
 
     echo "复制配置文件到${config_path} ..."
     mkdir -p ${config_path}
-    /usr/bin/cp -a prometheus.yml ${config_path}/prometheus.yml
+    $(which cp) -a prometheus.yml ${config_path}/prometheus.yml
     chown -R ${exec_user}.${exec_user} ${config_path}/prometheus.yml
 
     echo "创建数据目录 ${tsdb_path} ..."

@@ -48,7 +48,7 @@ function _install_node_exporter() {
     cd ${file_path}
     
     echo "复制二进制文件到 ${binary_path} ..."
-    /usr/bin/cp -a node_exporter ${binary_path}
+    $(which cp) -a node_exporter ${binary_path}
     chown -R ${exec_user}.${exec_user} ${binary_path}/node_exporter
 }
 
