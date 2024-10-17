@@ -17,8 +17,8 @@ function main_menu() {
         case $OPTION in
         1) install_prometheus ;;
         2) install_prometheus_local ;;
-        3) install_node_exporter_local ;;
-        4) install_node_exporter ;;
+        3) install_node_exporter ;;
+        4) install_node_exporter_local ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."

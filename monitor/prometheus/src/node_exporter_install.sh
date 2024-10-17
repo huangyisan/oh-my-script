@@ -83,9 +83,9 @@ EOF
 function _start_node_exporter() {
     echo "正在启动 node_exporter 服务 ..."
     systemctl daemon-reload
-    systemctl enable node_exporter --now
-    systemctl --no-pager status node_exporter
-    echo "node_exporter 安装完成。"
+    systemctl enable node-exporter --now
+    systemctl --no-pager status node-exporter
+    echo "node-exporter 安装完成。"
 }
 
 function install_node_exporter() {
