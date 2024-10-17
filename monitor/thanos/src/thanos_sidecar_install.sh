@@ -88,7 +88,7 @@ function _start_thanos_sidecar() {
 }
 
 function install_thanos_sidecar() {
-    _check_thanos_local
+    _check_thanos_sidecar_local
     _create_thanos_user
     _download_latest_thanos
     _install_thanos_sidecar
