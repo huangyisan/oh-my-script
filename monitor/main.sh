@@ -20,6 +20,20 @@ function switch_github_proxy() {
 }
 
 exec_path=$(pwd)
+
+# 避免环境变量污染
+function source_prometheus() {
+    source ./prometheus/src/prometheus_install.sh
+}
+function source_node_exporter() {
+    source ./prometheus/src/node_exporter_install.sh
+}
+function source_thanos_sidecar() {
+    source ./thanos/src/thanos_sidecar_install.sh
+}
+function source_thanos_query() {
+    source ./thanos/src/thanos_query_install.sh
+}
 # 主菜单
 function main_menu() {
     while true; do
@@ -38,12 +52,12 @@ function main_menu() {
 
         case $OPTION in
         0) switch_github_proxy ;;
-        1) install_prometheus ;;
-        2) install_prometheus_local ;;
-        3) install_node_exporter ;;
-        4) install_node_exporter_local ;;
-        5) install_thanos_sidecar ;;
-        6) install_thanos_query ;;
+        1) source_prometheus && install_prometheus ;;
+        2) source_prometheus && install_prometheus_local ;;
+        3) source_node_exporter && install_node_exporter ;;
+        4) source_node_exporter && install_node_exporter_local ;;
+        5) source_thanos_sidecar && install_thanos_sidecar ;;
+        6) source_thanos_query && install_thanos_query ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
