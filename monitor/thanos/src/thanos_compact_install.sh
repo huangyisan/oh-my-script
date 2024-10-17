@@ -61,7 +61,7 @@ function _create_thanos_compact_systemctl_config() {
     echo "生成systemctl 配置文件 ..."
     cat <<EOF >${systemctl_path}
 [Unit]
-Description=Thanos Store
+Description=Thanos compact
 Documentation=https://thanos.io/
 Wants=network-online.target
 After=network-online.target
@@ -76,7 +76,6 @@ ExecStart=${binary_path}/${thanos_component_name} compact \
     --objstore.config-file=${objstore_config_path}/thanos-alioss.yml \
     --http-address=0.0.0.0:10912 \
     --wait \
-    --block-sync-concurrency=30 \
     --compact.concurrency=6
 
 ExecReload=/bin/kill -HUP $MAINPID
