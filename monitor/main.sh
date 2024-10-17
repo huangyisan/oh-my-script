@@ -31,6 +31,7 @@ function main_menu() {
         echo "3. 安装node_exporter最新release"
         echo "4. 从本地安装node_exporter"
         echo "5. 安装thanos-sidecar最新release"
+        echo "6. 安装thanos-query最新release"
         read -p "请输入选项（0-9）: " OPTION
 
         case $OPTION in
@@ -39,6 +40,8 @@ function main_menu() {
         2) install_prometheus_local ;;
         3) install_node_exporter ;;
         4) install_node_exporter_local ;;
+        5) install_thanos_sidecar;;
+        6) install_thanos_query;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
