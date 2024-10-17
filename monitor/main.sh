@@ -3,6 +3,8 @@ source ./common/pre_check.sh
 source ./prometheus/src/prometheus_install.sh
 source ./prometheus/src/node_exporter_install.sh
 
+source ./thanos/src/thanos_sidecar_install.sh
+
 # github proxy
 function switch_github_proxy() {
     # 判断github_proxy_prefix是否为空
@@ -28,6 +30,7 @@ function main_menu() {
         echo "2. 从本地安装prometheus"
         echo "3. 安装node_exporter最新release"
         echo "4. 从本地安装node_exporter"
+        echo "5. 安装thanos-sidecar最新release"
         read -p "请输入选项（0-9）: " OPTION
 
         case $OPTION in
