@@ -36,7 +36,7 @@ function _download_latest_prometheus() {
     download_url=$(curl -s https://api.github.com/repos/prometheus/prometheus/releases/latest | grep "browser_download_url" | grep "linux-amd64" | grep -P -o "https.+" | sed 's/.$//')
     file_name=$(echo $download_url | awk -F '/' '{print $NF}')
     file_name_without_suffix=$(echo $file_name | sed 's/\.tar.gz//')
-    curl --connect-timeout 30 --max-time 30 -L -o ${file_name} ${download_url}
+    curl --connect-timeout 30 --max-time 30 -L -o ${file_name} ${github_proxy_prefix}${download_url}
     if [ $? -ne 0 ]; then
         echo "下载文件失败。"
         exit 1
