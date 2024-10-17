@@ -7,6 +7,7 @@ source ./prometheus/src/node_exporter_install.sh
 source ./thanos/src/thanos_sidecar_install.sh
 source ./thanos/src/thanos_query_install.sh
 source ./thanos/src/thanos_store_install.sh
+source ./thanos/src/thanos_compact_install.sh
 
 # github proxy
 function switch_github_proxy() {
@@ -38,6 +39,9 @@ function source_thanos_query() {
 function source_thanos_store() {
     source ./thanos/src/thanos_store_install.sh
 }
+function source_thanos_compact() {
+    source ./thanos/src/thanos_compact_install.sh
+}
 # 主菜单
 function main_menu() {
     while true; do
@@ -53,6 +57,7 @@ function main_menu() {
         echo "5. 安装thanos-sidecar最新release"
         echo "6. 安装thanos-query最新release"
         echo "7. 安装thanos-store最新release"
+        echo "8. 安装thanos-compact最新release"
         read -p "请输入选项（0-9）: " OPTION
 
         case $OPTION in
@@ -64,6 +69,7 @@ function main_menu() {
         5) source_thanos_sidecar && install_thanos_sidecar ;;
         6) source_thanos_query && install_thanos_query ;;
         7) source_thanos_store && install_thanos_store ;;
+        8) source_thanos_compact && install_thanos_compact ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."

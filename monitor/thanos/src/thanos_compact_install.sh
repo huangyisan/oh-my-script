@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# thanos store env
+# thanos compact env
 binary_path="/usr/local/sbin"
-store_path="/data/thanos/store"
-systemctl_path="/etc/systemd/system/thanos-store.service"
+store_path="/data/thanos/compact"
+systemctl_path="/etc/systemd/system/thanos-compact.service"
 objstore_config_path="/etc/thanos"
 exec_user="prometheus"
-thanos_component_name="thanos-store"
+thanos_component_name="thanos-compact"
 
-function _check_thanos_store_local() {
+function _check_thanos_compact_local() {
     echo "正在检查是否已安装 ${thanos_component_name} ..."
     if command -v ${thanos_component_name} &>/dev/null; then
         echo "${thanos_component_name} 已安装。退出。"
@@ -21,7 +21,7 @@ function _create_thanos_user() {
     useradd -s /sbin/nologin ${exec_user}
 }
 
-function _download_latest_thanos_store() {
+function _download_latest_thanos_compact() {
     echo "获取最新release 版本信息 ..."
     latest_release=$(curl -s https://api.github.com/repos/thanos-io/thanos/releases/latest | grep "tag_name" | cut -d : -f 2 | tr -d "\" , ")
 
@@ -40,17 +40,14 @@ function _download_latest_thanos_store() {
         echo "下载文件失败。"
         exit 1
     fi
-
 }
 
-function _install_thanos_store() {
+function _install_thanos_compact() {
     echo "开始解压，并安装 ..."
-
     mkdir -p ${store_path}
     chown -R ${exec_user}.${exec_user} ${store_path}
     mkdir -p ${objstore_config_path}
     chown -R ${exec_user}.${exec_user} ${objstore_config_path}
-
     tar zxf ${file_name}
     file_path=$(echo ${file_name_without_suffix} | awk -F '/' '{print $NF}')
     cd ${file_path}
@@ -60,7 +57,7 @@ function _install_thanos_store() {
     chown -R ${exec_user}.${exec_user} ${binary_path}/${thanos_component_name}
 }
 
-function _create_thanos_store_systemctl_config() {
+function _create_thanos_compact_systemctl_config() {
     echo "生成systemctl 配置文件 ..."
     cat <<EOF >${systemctl_path}
 [Unit]
@@ -77,12 +74,10 @@ Type=simple
 ExecStart=${binary_path}/${thanos_component_name} store \
     --data-dir=${store_path} \
     --objstore.config-file=${objstore_config_path}/thanos-alioss.yml \
-    --http-address=0.0.0.0:10905 \
-    --grpc-address=0.0.0.0:10906 \
-    --block-sync-concurrency=200 \
-    --store.grpc.series-max-concurrency=200 \
-    --chunk-pool-size=2GB \
-    --max-time=30d
+    --http-address=0.0.0.0:10912 \
+    --wait \
+    --block-sync-concurrency=30 \
+    --compact.concurrency=6
 
 ExecReload=/bin/kill -HUP $MAINPID
 TimeoutStopSec=10s
@@ -106,12 +101,12 @@ function _clean_tmp_file_path() {
     rm -rf ${file_path}
 }
 
-function install_thanos_store() {
-    _check_thanos_store_local
+function install_thanos_compact() {
+    _check_thanos_compact_local
     _create_thanos_user
-    _download_latest_thanos_store
-    _install_thanos_store
-    _create_thanos_store_systemctl_config
+    _download_latest_thanos_compact
+    _install_thanos_compact
+    _create_thanos_compact_systemctl_config
     _start_thanos_query
     _clean_tmp_file_path
 }
