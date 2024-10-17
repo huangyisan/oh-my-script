@@ -88,6 +88,12 @@ function _start_thanos_sidecar() {
     echo "Thanos 安装完成。"
 }
 
+function _clean_tmp_file_path() {
+    echo "正在清理临时目录 ${file_path} ..."
+    cd ${exec_path}
+    rm -rf ${file_path}
+}
+
 function install_thanos_sidecar() {
     _check_thanos_sidecar_local
     _create_thanos_user
@@ -95,4 +101,5 @@ function install_thanos_sidecar() {
     _install_thanos_sidecar
     _create_systemctl_config
     _start_thanos_sidecar
+    _clean_tmp_file_path
 }

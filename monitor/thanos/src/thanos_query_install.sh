@@ -93,6 +93,12 @@ function _start_thanos_query() {
     echo "Thanos 安装完成。"
 }
 
+function _clean_tmp_file_path() {
+    echo "正在清理临时目录 ${file_path} ..."
+    cd ${exec_path}
+    rm -rf ${file_path}
+}
+
 function install_thanos_query() {
     _check_thanos_query_local
     _create_thanos_user
@@ -100,4 +106,5 @@ function install_thanos_query() {
     _install_thanos_query
     _create_systemctl_config
     _start_thanos_query
+    _clean_tmp_file_path
 }
