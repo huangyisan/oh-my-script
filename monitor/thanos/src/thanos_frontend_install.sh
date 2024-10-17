@@ -1,14 +1,12 @@
 #!/bin/bash
 
-# thanos store env
+#thanos frontend env
 binary_path="/usr/local/sbin"
-store_path="/data/thanos/store"
-systemctl_path="/etc/systemd/system/thanos-store.service"
-objstore_config_path="/etc/thanos"
+systemctl_path="/etc/systemd/system/thanos-frontend.service"
 exec_user="prometheus"
-thanos_component_name="thanos-store"
+thanos_component_name="thanos-frontend"
 
-function _check_thanos_store_local() {
+function _check_thanos_frontend_local() {
     echo "正在检查是否已安装 ${thanos_component_name} ..."
     if command -v ${thanos_component_name} &>/dev/null; then
         echo "${thanos_component_name} 已安装。退出。"
@@ -21,7 +19,7 @@ function _create_thanos_user() {
     useradd -s /sbin/nologin ${exec_user}
 }
 
-function _download_latest_thanos_store() {
+function _download_latest_thanos_frontend() {
     echo "获取最新release 版本信息 ..."
     latest_release=$(curl -s https://api.github.com/repos/thanos-io/thanos/releases/latest | grep "tag_name" | cut -d : -f 2 | tr -d "\" , ")
 
@@ -40,10 +38,9 @@ function _download_latest_thanos_store() {
         echo "下载文件失败。"
         exit 1
     fi
-
 }
 
-function _install_thanos_store() {
+function _install_thanos_frontend() {
     echo "开始解压，并安装 ..."
 
     mkdir -p ${store_path}
@@ -60,11 +57,11 @@ function _install_thanos_store() {
     chown -R ${exec_user}.${exec_user} ${binary_path}/${thanos_component_name}
 }
 
-function _create_thanos_store_systemctl_config() {
+function _create_thanos_frontend_systemctl_config() {
     echo "生成systemctl 配置文件 ..."
     cat <<EOF >${systemctl_path}
 [Unit]
-Description=Thanos Store
+Description=Thanos Frontend
 Documentation=https://thanos.io/
 Wants=network-online.target
 After=network-online.target
@@ -74,15 +71,10 @@ LimitNOFILE=65536
 User=${exec_user}
 Group=${exec_user}
 Type=simple
-ExecStart=${binary_path}/${thanos_component_name} store \
-    --data-dir=${store_path} \
-    --objstore.config-file=${objstore_config_path}/thanos-alioss.yml \
-    --http-address=0.0.0.0:10905 \
-    --grpc-address=0.0.0.0:10906 \
-    --block-sync-concurrency=200 \
-    --store.grpc.series-max-concurrency=200 \
-    --chunk-pool-size=2GB \
-    --max-time=30d
+ExecStart=${binary_path}/${thanos_component_name} query-frontend \
+    --http-address=0.0.0.0:9090 \
+    --query-frontend.downstream-url=http://127.0.0.1:10903 \
+    --log.level=info
 
 ExecReload=/bin/kill -HUP $MAINPID
 TimeoutStopSec=10s
@@ -92,7 +84,7 @@ WantedBy=multi-user.target
 EOF
 }
 
-function _start_thanos_store() {
+function _start_thanos_frontend() {
     echo "正在启动 ${thanos_component_name} 服务 ..."
     systemctl daemon-reload
     systemctl enable ${thanos_component_name} --now
@@ -106,12 +98,12 @@ function _clean_tmp_file_path() {
     rm -rf ${file_path}
 }
 
-function install_thanos_store() {
-    _check_thanos_store_local
+function install_thanos_frontend() {
+    _check_thanos_frontend_local
     _create_thanos_user
-    _download_latest_thanos_store
-    _install_thanos_store
-    _create_thanos_store_systemctl_config
-    _start_thanos_store
+    _download_latest_thanos_frontend
+    _install_thanos_frontend
+    _create_thanos_frontend_systemctl_config
+    _start_thanos_frontend
     _clean_tmp_file_path
 }
