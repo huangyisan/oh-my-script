@@ -8,7 +8,7 @@ exec_user="prometheus"
 
 function _check_thanos_sidecar_local() {
     echo "正在检查是否已安装 thanos ..."
-    if command -v thanos-sidecar &> /dev/null; then
+    if command -v thanos-sidecar &>/dev/null; then
         echo "thanos 已安装。退出。"
         exit 1
     fi
@@ -33,7 +33,7 @@ function _download_latest_thanos() {
     download_url=$(curl -s https://api.github.com/repos/thanos-io/thanos/releases/latest | grep "browser_download_url" | grep "linux-amd64" | grep -P -o "https.+" | sed 's/.$//')
     file_name=$(echo $download_url | awk -F '/' '{print $NF}')
     file_name_without_suffix=$(echo $file_name | sed 's/\.tar.gz//')
-    curl --connect-timeout 30 --max-time 30 -L -o ${file_name} ${github_proxy_prefix}${download_url}
+    curl --connect-timeout ${CURL_TIMEOUT} --max-time ${CURL_TIMEOUT} -L -o ${file_name} ${github_proxy_prefix}${download_url}
     if [ $? -ne 0 ]; then
         echo "下载文件失败。"
         exit 1
@@ -42,7 +42,7 @@ function _download_latest_thanos() {
 
 function _install_thanos_sidecar() {
     echo "开始解压，并安装 ..."
-    
+
     tar zxf ${file_name}
     file_path=$(echo ${file_name_without_suffix} | awk -F '/' '{print $NF}')
     cd ${file_path}
@@ -54,7 +54,7 @@ function _install_thanos_sidecar() {
 
 function _create_systemctl_config() {
     echo "生成systemctl 配置文件 ..."
-    cat <<EOF > ${systemctl_path}
+    cat <<EOF >${systemctl_path}
 [Unit]
 Description=Thanos Sidecar
 Documentation=https://thanos.io/

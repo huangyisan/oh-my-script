@@ -10,7 +10,7 @@ tsdb_path="/data/prometheus"
 
 function _check_prometheus_local() {
     echo "正在检查是否已安装 Prometheus ..."
-    if command -v prometheus &> /dev/null; then
+    if command -v prometheus &>/dev/null; then
         echo "Prometheus 已安装。退出。"
         exit 1
     fi
@@ -35,7 +35,7 @@ function _download_latest_prometheus() {
     download_url=$(curl -s https://api.github.com/repos/prometheus/prometheus/releases/latest | grep "browser_download_url" | grep "linux-amd64" | grep -P -o "https.+" | sed 's/.$//')
     file_name=$(echo $download_url | awk -F '/' '{print $NF}')
     file_name_without_suffix=$(echo $file_name | sed 's/\.tar.gz//')
-    curl --connect-timeout 30 --max-time 30 -L -o ${file_name} ${github_proxy_prefix}${download_url}
+    curl --connect-timeout ${CURL_TIMEOUT} --max-time ${CURL_TIMEOUT} -L -o ${file_name} ${github_proxy_prefix}${download_url}
     if [ $? -ne 0 ]; then
         echo "下载文件失败。"
         exit 1
@@ -44,11 +44,11 @@ function _download_latest_prometheus() {
 
 function _install_prometheus() {
     echo "开始解压，并安装 ..."
-    
+
     tar zxf ${file_name}
     file_path=$(echo ${file_name_without_suffix} | awk -F '/' '{print $NF}')
     cd ${file_path}
-    
+
     echo "复制二进制文件到 ${binary_path} ..."
     $(which cp) -a promtool prometheus ${binary_path}
     chown -R ${exec_user}.${exec_user} ${binary_path}/prometheus
@@ -71,7 +71,7 @@ function _install_prometheus() {
 
 function _create_systemctl_config() {
     echo "生成systemctl 配置文件 ..."
-    cat <<EOF > ${systemctl_path}
+    cat <<EOF >${systemctl_path}
 [Unit]
 Description=Prometheus
 Documentation=https://prometheus.io/
@@ -113,14 +113,13 @@ function _start_prometheus() {
     echo "Prometheus 安装完成。"
 }
 
-
 function install_prometheus() {
     _check_prometheus_local
     _create_prometheus_user
     _download_latest_prometheus
     _install_prometheus
     _create_systemctl_config
-    _start_prometheus   
+    _start_prometheus
 }
 
 # 指定本地文件
@@ -149,11 +148,11 @@ function _clean_tmp_file_path() {
 function install_prometheus_local() {
     _check_prometheus_local
     _create_prometheus_user
-    if ! _specify_local_file; then  # 检查返回值
-        return  # 如果失败，返回到主菜单
+    if ! _specify_local_file; then # 检查返回值
+        return                     # 如果失败，返回到主菜单
     fi
     _install_prometheus
     _create_systemctl_config
-    _start_prometheus  
+    _start_prometheus
     _clean_tmp_file_path
 }

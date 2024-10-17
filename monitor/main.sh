@@ -1,5 +1,6 @@
 #!/bin.bash
 source ./common/pre_check.sh
+source ./common/env.sh
 source ./prometheus/src/prometheus_install.sh
 source ./prometheus/src/node_exporter_install.sh
 
@@ -14,7 +15,7 @@ function switch_github_proxy() {
     else
         unset github_proxy_prefix
         echo "已取消github代理。"
-    fi   
+    fi
 }
 
 exec_path=$(pwd)
@@ -22,7 +23,7 @@ exec_path=$(pwd)
 function main_menu() {
     while true; do
         clear
-        
+
         echo "退出脚本，请按ctrl c退出即可"
         echo "请选择要执行的操作:"
         echo "0. github代理开关"
@@ -40,8 +41,8 @@ function main_menu() {
         2) install_prometheus_local ;;
         3) install_node_exporter ;;
         4) install_node_exporter_local ;;
-        5) install_thanos_sidecar;;
-        6) install_thanos_query;;
+        5) install_thanos_sidecar ;;
+        6) install_thanos_query ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
