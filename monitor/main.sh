@@ -11,7 +11,7 @@ source ./thanos/src/thanos_query_install.sh
 function switch_github_proxy() {
     # 判断github_proxy_prefix是否为空
     if [ -z "$github_proxy_prefix" ]; then
-        github_proxy_prefix="https://ghp.ci/"
+        export github_proxy_prefix="https://ghp.ci/"
         echo "已设置github代理为：$github_proxy_prefix"
     else
         unset github_proxy_prefix

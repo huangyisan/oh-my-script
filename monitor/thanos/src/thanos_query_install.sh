@@ -20,7 +20,7 @@ function _create_thanos_user() {
     useradd -s /sbin/nologin ${exec_user}
 }
 
-function _download_latest_thanos() {
+function _download_latest_thanos_query() {
     echo "获取最新release 版本信息 ..."
     latest_release=$(curl -s https://api.github.com/repos/thanos-io/thanos/releases/latest | grep "tag_name" | cut -d : -f 2 | tr -d "\" , ")
 
@@ -53,7 +53,7 @@ function _install_thanos_query() {
     chown -R ${exec_user}.${exec_user} ${binary_path}/${thanos_component_name}
 }
 
-function _create_systemctl_config() {
+function _create_thanos_query_systemctl_config() {
     echo "生成systemctl 配置文件 ..."
     cat <<EOF >${systemctl_path}
 [Unit]
@@ -102,9 +102,9 @@ function _clean_tmp_file_path() {
 function install_thanos_query() {
     _check_thanos_query_local
     _create_thanos_user
-    _download_latest_thanos
+    _download_latest_thanos_query
     _install_thanos_query
-    _create_systemctl_config
+    _create_thanos_query_systemctl_config
     _start_thanos_query
     _clean_tmp_file_path
 }

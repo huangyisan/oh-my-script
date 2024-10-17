@@ -51,7 +51,7 @@ function _install_node_exporter() {
     chown -R ${exec_user}.${exec_user} ${binary_path}/node_exporter
 }
 
-function _create_systemctl_config() {
+function _create_node_exporter_systemctl_config() {
     echo "生成systemctl 配置文件 ..."
     cat <<EOF >${systemctl_path}
 [Unit]
@@ -93,7 +93,7 @@ function install_node_exporter() {
     _create_node_exporter_user
     _download_latest_node_exporter
     _install_node_exporter
-    _create_systemctl_config
+    _create_node_exporter_systemctl_config
     _start_node_exporter
 }
 
@@ -126,7 +126,7 @@ function install_node_exporter_local() {
         return                     # 如果失败，返回到主菜单
     fi
     _install_node_exporter
-    _create_systemctl_config
+    _create_node_exporter_systemctl_config
     _start_node_exporter
     _clean_tmp_file_path
 }
