@@ -69,7 +69,8 @@ ExecStart=${binary_path}/node_exporter \
     --collector.mountstats \
     --collector.sysctl \
     --collector.systemd \
-    --collector.tcpstat
+    --collector.tcpstat \
+    --web.listen-address=127.0.0.1:9100
 
 ExecReload=/bin/kill -HUP $MAINPID
 TimeoutStopSec=10s
