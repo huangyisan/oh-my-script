@@ -47,7 +47,8 @@ function _install_prometheus() {
     echo "开始解压，并安装 ..."
     
     tar zxf ${file_name}
-    cd ${file_name_without_suffix}
+    file_path=$(echo ${file_name_without_suffix} | awk -F '/' '{print $NF}')
+    cd ${file_path}
     
     echo "复制二进制文件到 ${binary_path} ..."
     /usr/bin/cp -a promtool prometheus ${binary_path}
@@ -126,7 +127,7 @@ function install_prometheus() {
 # 指定本地文件
 function _specify_local_file() {
     # 控制台输入文件名
-    read -p "请输入文件名(tar.gz包)：" file_name
+    read -p "请输入文件绝对路径名称(tar.gz包)：" file_name
     if [ -z "$file_name" ]; then
         echo "文件名不能为空。"
         return 1
@@ -140,6 +141,12 @@ function _specify_local_file() {
 
 }
 
+function _clean_tmp_file_path() {
+    echo "正在清理临时目录 ${file_path} ..."
+    cd ${exec_path}
+    rm -rf ${file_path}
+}
+
 function install_prometheus_local() {
     _check_prometheus_local
     _create_prometheus_user
@@ -149,4 +156,5 @@ function install_prometheus_local() {
     _install_prometheus
     _create_systemctl_config
     _start_prometheus  
+    _clean_tmp_file_path
 }

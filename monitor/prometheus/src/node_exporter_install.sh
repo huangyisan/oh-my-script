@@ -101,7 +101,7 @@ function install_node_exporter() {
 # 指定本地文件
 function _specify_local_file() {
     # 控制台输入文件名
-    read -p "请输入文件名(tar.gz包)：" file_name
+    read -p "请输入文件绝对路径名称(tar.gz包)：" file_name
     if [ -z "$file_name" ]; then
         echo "文件名不能为空。"
         return 1
@@ -114,6 +114,12 @@ function _specify_local_file() {
     file_name_without_suffix=$(echo $file_name | sed 's/\.tar.gz//')
 }
 
+function _clean_tmp_file_path() {
+    echo "正在清理临时目录 ${file_path} ..."
+    cd ${exec_path}
+    rm -rf ${file_path}
+}
+
 function install_node_exporter_local() {
     _check_node_exporter_local
     _create_node_exporter_user
@@ -123,4 +129,5 @@ function install_node_exporter_local() {
     _install_node_exporter
     _create_systemctl_config
     _start_node_exporter
+    _clean_tmp_file_path
 }

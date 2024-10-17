@@ -1,6 +1,8 @@
 #!/bin.bash
 source ./src/prometheus_install.sh
 source ./src/node_exporter_install.sh
+
+exec_path=$(pwd)
 # 主菜单
 function main_menu() {
     while true; do
