@@ -149,6 +149,7 @@ function _clean_tmp_file_path() {
 
 function install_consul_server() {
     _check_consul_local
+    _check_command
     _create_consul_user
     _specify_local_file
     _install_consul
