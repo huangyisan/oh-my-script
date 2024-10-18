@@ -1,0 +1,44 @@
+{
+    "data_dir": "/data/consul/data",
+    "log_file": "/data/consul/log/consul.log",
+    "log_level": "INFO",
+    "log_rotate_duration": "24h",
+    "server": true,
+    "bootstrap_expect": 3,
+    "bind_addr": "0.0.0.0",
+    "client_addr": "0.0.0.0",
+    "advertise_addr": "10.11.12.139",
+    "datacenter": "dc1",
+    "start_join": ["10.11.12.136","10.11.12.137","10.11.12.138"],
+    "ui": true,
+    "limits":
+    {
+        "http_max_conns_per_client": 1000,
+        "rpc_max_conns_per_client": 1000
+    },
+    "telemetry":
+    {
+    "prometheus_retention_time": "60s"
+    },
+    "tls": {
+        "defaults": {
+            "ca_file": "/data/consul/tls/consul-agent-ca.pem",
+            "cert_file": "/data/consul/tls/dc1-server-consul-0.pem",
+            "key_file": "/data/consul/tls/dc1-server-consul-0-key.pem",
+            "verify_incoming": true,
+            "verify_outgoing": true,
+            "verify_server_hostname": true
+        }
+    },
+    "auto_encrypt": {
+        "allow_tls": true
+    },
+    "acl": {
+        "enabled": true,
+        "default_policy": "deny",
+        "enable_token_persistence": true,
+        "tokens" :{
+            "agent": "86d6711a-c152-8a63-c3b8-de5fd45a0a7e"
+        }
+    }
+}
