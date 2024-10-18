@@ -148,10 +148,10 @@ function _clean_tmp_file_path() {
 }
 
 function install_consul_server() {
-    _check_consul_local
-    _check_command
-    _create_consul_user
     _specify_local_file
+    _check_command
+    _check_consul_local
+    _create_consul_user
     _install_consul
     _create_consul_systemctl_config
     _create_consul_server_config_json_file
