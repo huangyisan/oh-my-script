@@ -2,6 +2,7 @@
 
 # consul env
 binary_path="/usr/local/sbin"
+unzip_tmp_file="tmp_consul"
 config_path="/etc/consul"
 data_path="/data/consul/data"
 log_path="/data/consul/log"
@@ -41,14 +42,26 @@ function _download_latest_consul() {
     fi
 }
 
+function _specify_local_file() {
+    # 控制台输入文件名
+    read -p "请输入文件绝对路径名称(zip包)：" file_name
+    if [ -z "$file_name" ]; then
+        echo "文件名不能为空。"
+        return 1
+    fi
+    #检查当前目录是否存在文件
+    if [ ! -f "$file_name" ]; then
+        echo "文件不存在。"
+        return 1
+    fi
+}
+
 function _install_consul() {
     echo "开始解压，并安装 ..."
-    tar zxf ${file_name}
-    file_path=$(echo ${file_name_without_suffix} | awk -F '/' '{print $NF}')
-    cd ${file_path}
+    unzip ${file_name} -d ${unzip_tmp_file}
 
     echo "复制二进制文件到 ${binary_path} ..."
-    $(which cp) -a consul ${binary_path}
+    $(which cp) -a tmp_consul/consul ${binary_path}
     chown -R ${exec_user}.${exec_user}${binary_path}/consul
 
     echo "创建相关目录 ${config_path} ${data_path} ${log_path} ..."
@@ -120,15 +133,15 @@ function _start_consul() {
 }
 
 function _clean_tmp_file_path() {
-    echo "正在清理临时目录 ${file_path} ..."
+    echo "正在清理临时目录 ${unzip_tmp_file} ..."
     cd ${exec_path}
-    rm -rf ${file_path}
+    rm -rf ${unzip_tmp_file}
 }
 
 function install_consul_server() {
     _check_consul_local
     _create_consul_user
-    _download_latest_consul
+    _specify_local_file
     _install_consul
     _create_consul_systemctl_config
     _create_consul_server_config_json_file

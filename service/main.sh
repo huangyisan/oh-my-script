@@ -29,8 +29,8 @@ function main_menu() {
         echo "退出脚本，请按ctrl c退出即可"
         echo "请选择要执行的操作:"
         echo "0. github代理开关"
-        echo "1. 安装consul server最新release"
-        echo "2. 安装consul agent最新release"
+        echo "1. 从本地安装consul server"
+        echo "2. 从本地安装consul agent最新release"
         read -p "请输入选项（0-9）: " OPTION
 
         case $OPTION in
