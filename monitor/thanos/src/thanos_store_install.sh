@@ -82,7 +82,8 @@ ExecStart=${binary_path}/${thanos_component_name} store \
     --block-sync-concurrency=200 \
     --store.grpc.series-max-concurrency=200 \
     --chunk-pool-size=2GB \
-    --max-time=30d
+    --max-time=30d \
+    --sync-block-duration=15m
 
 ExecReload=/bin/kill -HUP $MAINPID
 TimeoutStopSec=10s
