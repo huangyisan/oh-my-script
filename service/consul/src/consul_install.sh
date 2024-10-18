@@ -17,6 +17,14 @@ function _check_consul_local() {
     fi
 }
 
+function _check_command() {
+    command -v unzip &>/dev/null
+    if [ $? -ne 0 ]; then
+        apt update
+        apt install unzip -y
+    fi
+}
+
 function _create_consul_user() {
     echo "正在创建 ${exec_user} 用户 ..."
     useradd -s /sbin/nologin ${exec_user}
