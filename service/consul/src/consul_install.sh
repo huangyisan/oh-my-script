@@ -24,6 +24,14 @@ function _create_consul_user() {
 function _download_latest_consul() {
     echo "获取最新release 版本信息 ..."
     latest_release=$(curl -s https://api.github.com/repos/hashicorp/consul/releases/latest | grep "tag_name" | cut -d : -f 2 | tr -d "\" , ")
+    # 检查是否获取到最新版本信息
+    if [ -z "$latest_release" ]; then
+        echo "无法获取最新版本信息。"
+        exit 1
+    fi
+
+    echo "正在下载最新版本 $latest_release ..."
+    download_url=$(curl -s https://api.github.com/repos/hashicorp/consul/releases/latest | grep "browser_download_url" | grep "linux_amd64" | grep -P -o "https.+" | sed 's/.$//')
     file_name=$(echo $download_url | awk -F '/' '{print $NF}')
     file_name_without_suffix=$(echo $file_name | sed 's/\.tar.gz//')
     curl --connect-timeout ${CURL_TIMEOUT} --max-time ${CURL_TIMEOUT} -L -o ${file_name} ${github_proxy_prefix}${download_url}

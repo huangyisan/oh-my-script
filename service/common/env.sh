@@ -1,0 +1,1 @@
+export CURL_TIMEOUT=600

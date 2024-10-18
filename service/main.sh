@@ -18,7 +18,7 @@ exec_path=$(pwd)
 
 # 避免环境变量污染
 function source_consul() {
-    source source ./consul/src/consul_install.sh
+    source ./consul/src/consul_install.sh
 }
 
 # 主菜单
