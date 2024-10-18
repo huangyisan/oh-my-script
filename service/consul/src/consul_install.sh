@@ -62,7 +62,7 @@ function _install_consul() {
 
     echo "复制二进制文件到 ${binary_path} ..."
     $(which cp) -a tmp_consul/consul ${binary_path}
-    chown -R ${exec_user}.${exec_user}${binary_path}/consul
+    chown -R ${exec_user}.${exec_user} ${binary_path}/consul
 
     echo "创建相关目录 ${config_path} ${data_path} ${log_path} ..."
     mkdir -p ${config_path} ${data_path} ${log_path}
@@ -118,7 +118,7 @@ function _create_consul_server_config_json_file() {
     },
     "telemetry":
     {
-    "prometheus_retention_time": "60s",
+    "prometheus_retention_time": "60s"
     }
 }
 EOF
@@ -128,6 +128,7 @@ function _start_consul() {
     echo "正在启动 consul 服务 ..."
     systemctl daemon-reload
     systemctl enable consul --now
+    sleep 5
     systemctl --no-pager status consul
     echo "consul 安装完成。"
 }
