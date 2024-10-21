@@ -40,7 +40,7 @@
               --collector.sysctl \
               --collector.systemd \
               --collector.tcpstat \
-              --web.listen-address=127.0.0.1:{{ node_exporter_port }}
+              --web.listen-address={{ ansible_default_ipv4.address }}:{{ node_exporter_port }}
 
           ExecReload=/bin/kill -HUP $MAINPID
           TimeoutStopSec=10s
