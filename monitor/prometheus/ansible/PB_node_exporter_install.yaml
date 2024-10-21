@@ -51,6 +51,6 @@
 
     - name: 启动 node-exporter
       systemd:
-        name: node_exporter_new
+        name: node-exporter-new
         state: started
         enabled: yes
