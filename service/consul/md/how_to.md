@@ -25,3 +25,8 @@ consul acl token create -description "Agent Token" -policy-name "agent-token"
 
 当需要请求服务的时候，需要将token添加到请求头中，例如：
 curl -H "X-Consul-Token: $CONSUL_HTTP_TOKEN" http://127.0.0.1:8500/v1/agent/self
+
+
+## 删除某个注册了的服务
+假设你要删除的服务 ID 是 node_exporter-10.11.12.12：
+consul services deregister -id node_exporter-10.11.12.12
