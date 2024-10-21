@@ -132,17 +132,37 @@ function _create_consul_server_config_json_file() {
 EOF
 }
 
-function _create_consul_client_config_json_file() {
+function _create_consul_client_with_tls_config_json_file() {
     echo "生成配置文件 ..."
     cat <<EOF >${config_path}/config.json
-{   
+{
     "server": false,
     "datacenter": "qz",
-    "data_dir": "${data_path}",
-    "log_file": "${log_path}/consul.log",
+    "data_dir": "/data/consul/data",
+    "node_name": "suzhou_idc_jumpserver",
+    "bind_addr": "ip",
+    "advertise_addr": "ip",
+    "log_file": "/data/consul/log/consul.log",
     "log_level": "INFO",
     "log_rotate_duration": "24h",
-    "start_join": ["ip1","ip2","ip3"]
+    "start_join": ["ip1","ip2","ip3"],
+    "encrypt": "FCiFCSbAPjNN04CKyFXGrBxAJwLXoiyb9e+CFWYIuxg=",
+    "tls": {
+        "defaults": {
+	    "ca_file": "/data/consul/tls/consul-agent-ca.pem",
+	    "verify_incoming": false,
+            "verify_outgoing": true,
+            "verify_server_hostname": true
+        }
+    },
+    "auto_encrypt": {
+        "tls": true
+    },
+    "acl": {
+        "tokens" :{
+            "agent": "xxxxxxxx"
+        }
+    }
 }
 EOF
 }
@@ -163,6 +183,7 @@ function _create_consul_server_with_tls_config_json_file() {
     "datacenter": "qz",
     "start_join": ["ip1","ip2","ip3"],
     "ui": true,
+    "encrypt": "FCiFCSbAPjNN04CKyFXGrBxAJwLXoiyb9e+CFWYIuxg="
     "limits":
     {
         "http_max_conns_per_client": 1000,
@@ -188,7 +209,11 @@ function _create_consul_server_with_tls_config_json_file() {
     "acl": {
         "enabled": true,
         "default_policy": "deny",
-        "enable_token_persistence": true
+        "enable_token_persistence": true,
+        "down_policy": "extend-cache",
+	    "tokens" :{
+            "agent": "xxxxxx"
+        }
     }
 }
 EOF
@@ -216,7 +241,7 @@ function install_consul_server() {
     _create_consul_user
     _install_consul
     _create_consul_systemctl_config
-    _create_consul_server_config_json_file
+    _create_consul_server_with_tls_config_json_file
     _start_consul
     _clean_tmp_file_path
 }
@@ -228,7 +253,7 @@ function install_consul_client() {
     _create_consul_user
     _install_consul
     _create_consul_systemctl_config
-    _create_consul_client_config_json_file
+    _create_consul_client_with_tls_config_json_file
     _start_consul
     _clean_tmp_file_path
 }
