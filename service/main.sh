@@ -36,7 +36,7 @@ function main_menu() {
         case $OPTION in
         0) switch_github_proxy ;;
         1) source_consul && install_consul_server ;;
-        2) source_consul && install_consul_agent ;;
+        2) source_consul && install_consul_client ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."

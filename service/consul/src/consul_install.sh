@@ -117,7 +117,7 @@ function _create_consul_server_config_json_file() {
     "client_addr": "0.0.0.0",
     "advertise_addr": "内网ip",
     "datacenter": "qz",
-    "start_join": ["内网ip1","内网ip2","内网ip3"],
+    "start_join": ["ip1","ip2","ip3"],
     "ui": true,
     "limits":
     {
@@ -127,6 +127,68 @@ function _create_consul_server_config_json_file() {
     "telemetry":
     {
     "prometheus_retention_time": "60s"
+    }
+}
+EOF
+}
+
+function _create_consul_client_config_json_file() {
+    echo "生成配置文件 ..."
+    cat <<EOF >${config_path}/config.json
+{   
+    "server": false,
+    "datacenter": "qz",
+    "data_dir": "${data_path}",
+    "log_file": "${log_path}/consul.log",
+    "log_level": "INFO",
+    "log_rotate_duration": "24h",
+    "start_join": ["ip1","ip2","ip3"]
+}
+EOF
+}
+
+function _create_consul_server_with_tls_config_json_file() {
+    echo "生成配置文件 ..."
+    cat <<EOF >$config_path/config.json
+{
+    "data_dir": "/data/consul/data",
+    "log_file": "/data/consul/log/consul.log",
+    "log_level": "INFO",
+    "log_rotate_duration": "24h",
+    "server": true,
+    "bootstrap_expect": 3,
+    "bind_addr": "0.0.0.0",
+    "client_addr": "0.0.0.0",
+    "advertise_addr": "10.11.12.136",
+    "datacenter": "qz",
+    "start_join": ["ip1","ip2","ip3"],
+    "ui": true,
+    "limits":
+    {
+        "http_max_conns_per_client": 1000,
+        "rpc_max_conns_per_client": 1000
+    },
+    "telemetry":
+    {
+    "prometheus_retention_time": "60s"
+    },
+    "tls": {
+        "defaults": {
+            "ca_file": "/data/consul/tls/consul-agent-ca.pem",
+            "cert_file": "/data/consul/tls/qz-server-consul-0.pem",
+            "key_file": "/data/consul/tls/qz-server-consul-0-key.pem",
+            "verify_incoming": true,
+            "verify_outgoing": true,
+            "verify_server_hostname": true
+        }
+    },
+    "auto_encrypt": {
+        "allow_tls": true
+    },
+    "acl": {
+        "enabled": true,
+        "default_policy": "deny",
+        "enable_token_persistence": true
     }
 }
 EOF
@@ -155,6 +217,18 @@ function install_consul_server() {
     _install_consul
     _create_consul_systemctl_config
     _create_consul_server_config_json_file
+    _start_consul
+    _clean_tmp_file_path
+}
+
+function install_consul_client() {
+    _specify_local_file
+    _check_command
+    _check_consul_local
+    _create_consul_user
+    _install_consul
+    _create_consul_systemctl_config
+    _create_consul_client_config_json_file
     _start_consul
     _clean_tmp_file_path
 }
