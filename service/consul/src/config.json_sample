@@ -37,6 +37,7 @@
         "enabled": true,
         "default_policy": "deny",
         "enable_token_persistence": true,
+        "down_policy": "extend-cache",
         "tokens" :{
             "agent": "86d6711a-c152-8a63-c3b8-de5fd45a0a7e"
         }
