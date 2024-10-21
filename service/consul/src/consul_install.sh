@@ -160,10 +160,14 @@ function _create_consul_client_with_tls_config_json_file() {
         "tls": true
     },
     "acl": {
-        "tokens" :{
-            "agent": "xxxxxxxx"
+        "enabled": true,
+        "default_policy": "deny",
+        "enable_token_persistence": true,
+        "down_policy": "extend-cache",
+	    "tokens" :{
+            "agent": "xxxxxx"
         }
-    }
+    }   
 }
 EOF
 }

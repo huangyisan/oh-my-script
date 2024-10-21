@@ -22,3 +22,6 @@ service_prefix "" {
 consul acl token create -description "Agent Token" -policy-name "agent-token"
 
 记录secretId 配置到server或者clinet上。 
+
+当需要请求服务的时候，需要将token添加到请求头中，例如：
+curl -H "X-Consul-Token: $CONSUL_HTTP_TOKEN" http://127.0.0.1:8500/v1/agent/self

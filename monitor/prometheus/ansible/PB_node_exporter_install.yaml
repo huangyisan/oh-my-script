@@ -1,0 +1,56 @@
+# playbook install node_exporter
+# ansible-playbook  install.yaml  -e "host_group=suzhou" -e "file_path=/root/node_exporter-1.8.2.linux-amd64.tar.gz" --limit x.x.x.x
+
+- # hosts 通过指定变量传入
+  hosts: "{{ host_group }}"
+  vars:
+    exec_user: "prometheus"
+    binary_path: "/usr/local/sbin"
+    node_exporter_port: 9100
+
+  tasks:
+    - name: copy node_exporter tar.gz
+      copy:
+        src: "{{ file_path }}"
+        dest: /tmp/node_exporter.tar.gz
+
+    - name: 解压 tar.gz
+      unarchive:
+        src: /tmp/node_exporter.tar.gz
+        dest: /usr/local/sbin
+        remote_src: yes
+
+    - name: 配置 systemd 启动文件
+      copy:
+        dest: /etc/systemd/system/node-exporter-new.service
+        content: |
+          [Unit]
+          Description=Node Exporter
+          Documentation=https://github.com/prometheus/node_exporter
+          Wants=network-online.target
+          After=network-online.target
+
+          [Service]
+          LimitNOFILE=65536
+          User={{ exec_user }}
+          Group={{ exec_user }}
+          Type=simple
+          ExecStart={{ binary_path }}/node_exporter \
+              --collector.mountstats \
+              --collector.sysctl \
+              --collector.systemd \
+              --collector.tcpstat \
+              --web.listen-address=127.0.0.1:{{ node_exporter_port }}
+
+          ExecReload=/bin/kill -HUP $MAINPID
+          TimeoutStopSec=10s
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: 启动 node-exporter
+      systemd:
+        name: node_exporter_new
+        state: started
+        enabled: yes
