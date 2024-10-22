@@ -1,0 +1,7 @@
+﻿server_name,ip,metric_port,health_check_ip,health_check_port,health_check_uri
+Elasticsearch,10.11.12.135,9100,10.11.12.135,9200,
+Elasticsearch,10.11.12.136,9100,10.11.12.136,9200,
+Elasticsearch,10.11.12.137,9100,10.11.12.137,9200,
+Elasticsearch,10.11.12.149,9100,10.11.12.149,9200,
+Elasticsearch,10.11.12.150,9100,10.11.12.150,9200,
+Elasticsearch,10.11.12.139,9100,10.11.12.139,9200,

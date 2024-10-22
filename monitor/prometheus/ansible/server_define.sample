@@ -2,15 +2,15 @@
     "id": "server-${server_name}-${ip}",
     "name": "server-${server_name}-${ip}",
     "tags": ["server"],
-    "address": ${ip},
-    "port": "${port}",
+    "address": "${ip}",
+    "port": ${port},
     "meta": {
         "job": "${server_name}"
     },
     "checks": 
     [
         {
-            "http": "http://${ip}:${port}/metrics",
+            "http": "${health_check_url}",
             "interval": "10s",
             "timeout": "5s"
         }
