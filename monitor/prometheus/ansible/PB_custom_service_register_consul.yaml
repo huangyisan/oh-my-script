@@ -1,0 +1,37 @@
+# playbook register node_exporter to consul
+# ansible-playbook  register_consul.yaml  -e "host_group=suzhou" -e "consul_server=61.155.137.69" -e "CONSUL_HTTP_TOKEN=${CONSUL_HTTP_TOKEN}" -e "manual_specific_lan_ip=10.11.12.12" --limit 180.97.153.252
+- # hosts 通过指定变量传入
+  hosts: "{{ host_group }}"
+  tasks:
+    - name: 获取网卡 eno2 的 IP 地址
+      setup:
+        gather_subset:
+          - network
+
+    - set_fact:
+        eno2_ip_address: "{{ lookup('vars', 'manual_specific_lan_ip') if lookup('vars', 'manual_specific_lan_ip') is defined else ansible_facts.eno2.ipv4.address }}"
+
+    - name: 宿主机上发送curl
+      delegate_to: localhost
+      register: result
+      ansible.builtin.uri:
+        url: http://{{ consul_server }}:8500/v1/agent/service/register
+        method: PUT
+        body_format: json
+        headers:
+          X-Consul-Token: "{{ CONSUL_HTTP_TOKEN }}"
+        body:
+          id: "node_exporter-{{ eno2_ip_address }}"
+          name: "node_exporter-{{ eno2_ip_address }}"
+          tags: ["node_exporter"]
+          address: "{{ eno2_ip_address }}"
+          port: 9100
+          meta:
+            project: "operator"
+          checks:
+            - http: "http://{{ eno2_ip_address }}:9100/metrics"
+              interval: "10s"
+              timeout: "5s"
+
+    - debug:
+        msg: "curl 相应内容: {{ result }}"

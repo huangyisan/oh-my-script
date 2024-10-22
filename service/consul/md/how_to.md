@@ -27,6 +27,11 @@ consul acl token create -description "Agent Token" -policy-name "agent-token"
 curl -H "X-Consul-Token: $CONSUL_HTTP_TOKEN" http://127.0.0.1:8500/v1/agent/self
 
 
+
+## 注册服务
+curl -X PUT -H "X-Consul-Token: $CONSUL_HTTP_TOKEN" -d @service.json http://127.0.0.1:8500/v1/agent/service/register
+
+
 ## 删除某个注册了的服务
 假设你要删除的服务 ID 是 node_exporter-10.11.12.12：
 consul services deregister -id node_exporter-10.11.12.12
