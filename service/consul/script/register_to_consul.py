@@ -15,8 +15,8 @@ tpl = """
     }},
     "checks": 
     [
-        {{
-            "http": "{health_check_url}",
+        {{  
+            "tcp": "{health_check_ip}:{health_check_port}",
             "interval": "10s",
             "timeout": "5s"
         }}
@@ -30,10 +30,8 @@ class ConsulRegister(object):
         self.register_url = f"http://{consul_url}/v1/agent/service/register"
     def set_server_info(self, *row):
         self.server_name, self.server_ip, self.metric_port, self.health_check_ip, self.health_check_port, self.health_check_uri = row
-        self.health_check_url = f"http://{self.health_check_ip}:{self.health_check_port}/{self.health_check_uri}"
-
     def make_template(self):
-        res = self.tpl.format(server_name=self.server_name,server_ip=self.server_ip, metric_port=self.metric_port, health_check_url=self.health_check_url)
+        res = self.tpl.format(server_name=self.server_name,server_ip=self.server_ip, metric_port=self.metric_port,health_check_ip=self.health_check_ip,health_check_port=self.health_check_port)
         return res
     def register_to_consul(self, data):
         logger.debug(f"start to register {self.server_name} - {self.server_ip}")
