@@ -59,7 +59,7 @@ function main_menu() {
         echo "8. 安装thanos-compact最新release"
         echo "9. 安装thanos-frontend最新release"
         echo "10. 安装thanos-ruler最新release"
-        read -p "请输入选项（0-9）: " OPTION
+        read -p "请输入选项（0-10）: " OPTION
 
         case $OPTION in
         0) switch_github_proxy ;;

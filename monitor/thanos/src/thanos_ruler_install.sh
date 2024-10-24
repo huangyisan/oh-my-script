@@ -2,6 +2,7 @@
 
 # thanos ruler env
 binary_path="/usr/local/sbin"
+systemctl_path="/etc/systemd/system/thanos-ruler.service"
 rule_file_path="/etc/thanos/rules"
 alertmanagers_config_path="/etc/thanos/thanos-ruler-alertmanager.yaml"
 query_config_path="/etc/thanos/thanos-ruler-query.yaml"
@@ -52,6 +53,7 @@ function _install_thanos_ruler() {
     echo "复制二进制文件到 ${binary_path} ..."
     $(which cp) -a thanos ${binary_path}/${thanos_component_name}
     chown -R ${exec_user}.${exec_user} ${binary_path}/${thanos_component_name}
+    mkdir -p ${data_path}
     chown -R ${exec_user}.${exec_user} ${data_path}
     mkdir -p ${rule_file_path}
     chown -R ${exec_user}.${exec_user} ${rule_file_path}
