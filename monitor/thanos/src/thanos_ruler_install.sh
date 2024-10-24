@@ -68,6 +68,7 @@ alertmanagers:
     scheme: http
     timeout: 30s
 EOF
+    chown -R ${exec_user}.${exec_user} ${alertmanagers_config_path}
 }
 
 function _create_ruler_query_config_file() {
@@ -77,6 +78,7 @@ function _create_ruler_query_config_file() {
   static_configs: ["query-ip:10903"]
   scheme: http
 EOF
+    chown -R ${exec_user}.${exec_user} ${alertmanagers_config_path}
 }
 
 function _create_thanos_ruler_systemctl_config() {
@@ -93,15 +95,14 @@ LimitNOFILE=65536
 User=${exec_user}
 Group=${exec_user}
 Type=simple
-ExecStart=${binary_path}/${thanos_component_name} ruler \
-    --http-address=127.0.0.1:10910
+ExecStart=${binary_path}/${thanos_component_name} rule \
+    --http-address=127.0.0.1:10910 \
     --grpc-address=127.0.0.1:10911 \
     --data-dir=${data_path} \
     --rule-file=${rule_file_path}/*/*.yaml \
     --alert.query-url=http://query-ip:10903 \
     --alertmanagers.config-file=${alertmanagers_config_path} \
     --query.config-file=${query_config_path} \
-    --query.replica-label=replica
 
 ExecReload=/bin/kill -HUP $MAINPID
 TimeoutStopSec=10s
