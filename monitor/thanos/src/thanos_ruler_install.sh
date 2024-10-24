@@ -103,8 +103,9 @@ ExecStart=${binary_path}/${thanos_component_name} rule \
     --alert.query-url=http://query-ip:10903 \
     --alertmanagers.config-file=${alertmanagers_config_path} \
     --query.config-file=${query_config_path} \
+    --web.external-prefix=http://10.11.12.136:10910
 
-ExecReload=/bin/kill -HUP $MAINPID
+ExecReload=/bin/kill -HUP \$MAINPID
 TimeoutStopSec=10s
 Restart=always
 [Install]

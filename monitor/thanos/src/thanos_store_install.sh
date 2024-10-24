@@ -85,7 +85,7 @@ ExecStart=${binary_path}/${thanos_component_name} store \
     --max-time=30d \
     --sync-block-duration=15m
 
-ExecReload=/bin/kill -HUP $MAINPID
+ExecReload=/bin/kill -HUP \$MAINPID
 TimeoutStopSec=10s
 Restart=always
 [Install]

@@ -75,7 +75,7 @@ ExecStart=${binary_path}/${thanos_component_name} query-frontend \
     --http-address=0.0.0.0:10913 \
     --query-frontend.downstream-url=http://127.0.0.1:10903
 
-ExecReload=/bin/kill -HUP $MAINPID
+ExecReload=/bin/kill -HUP \$MAINPID
 TimeoutStopSec=10s
 Restart=always
 [Install]

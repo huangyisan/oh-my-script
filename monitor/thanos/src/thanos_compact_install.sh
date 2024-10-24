@@ -78,7 +78,7 @@ ExecStart=${binary_path}/${thanos_component_name} compact \
     --wait \
     --compact.concurrency=6
 
-ExecReload=/bin/kill -HUP $MAINPID
+ExecReload=/bin/kill -HUP \$MAINPID
 TimeoutStopSec=10s
 Restart=always
 [Install]

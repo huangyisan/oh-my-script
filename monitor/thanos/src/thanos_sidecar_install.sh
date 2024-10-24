@@ -77,7 +77,7 @@ ExecStart=${binary_path}/${thanos_component_name} sidecar \
     --http-address=127.0.0.1:10901 \
     --grpc-address=127.0.0.1:10902 \
     --objstore.config-file=${objstore_config_path}/thanos-alioss.yml
-ExecReload=/bin/kill -HUP $MAINPID
+ExecReload=/bin/kill -HUP \$MAINPID
 TimeoutStopSec=10s
 Restart=always
 [Install]

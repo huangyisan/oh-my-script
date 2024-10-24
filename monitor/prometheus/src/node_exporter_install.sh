@@ -72,7 +72,7 @@ ExecStart=${binary_path}/node_exporter \
     --collector.tcpstat \
     --web.listen-address=127.0.0.1:9100
 
-ExecReload=/bin/kill -HUP $MAINPID
+ExecReload=/bin/kill -HUP \$MAINPID
 TimeoutStopSec=10s
 Restart=always
 

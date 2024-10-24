@@ -78,9 +78,11 @@ Type=simple
 ExecStart=${binary_path}/${prometheus_component_name} \
     --config.file=${config_path}/alertmanager.yml \
     --storage.path=${data_path} \
-    --cluster.listen-address=10.11.12.136:9093
+    --web.listen-address=10.11.12.136:9093 \
+    --cluster.listen-address=10.11.12.136:9094
 
-ExecReload=/bin/kill -HUP $MAINPID
+
+ExecReload=/bin/kill -HUP \$MAINPID
 TimeoutStopSec=10s
 Restart=always
 
