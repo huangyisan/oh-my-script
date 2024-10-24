@@ -59,6 +59,26 @@ function _install_thanos_ruler() {
     chown -R ${exec_user}.${exec_user} ${rule_file_path}
 }
 
+function _create_alertmanagers_config_file() {
+    echo "生成 alertmanagers 配置文件 ..."
+    cat <<EOF >${alertmanagers_config_path}
+alertmanagers:
+  - http_config:
+    static_configs: ["alert-manager:9093"]
+    scheme: http
+    timeout: 30s
+EOF
+}
+
+function _create_ruler_query_config_file() {
+    echo "生成 query 配置文件 ..."
+    cat <<EOF >${query_config_path}
+- http_config:
+  static_configs: ["query-ip:10903"]
+  scheme: http
+EOF
+}
+
 function _create_thanos_ruler_systemctl_config() {
     echo "生成systemctl 配置文件 ..."
     cat <<EOF >${systemctl_path}
@@ -110,6 +130,8 @@ function install_thanos_ruler() {
     _create_thanos_user
     _download_latest_thanos_ruler
     _install_thanos_ruler
+    _create_alertmanagers_config_file
+    _create_ruler_query_config_file
     _create_thanos_ruler_systemctl_config
     _start_thanos_ruler
     _clean_tmp_file_path
