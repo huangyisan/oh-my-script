@@ -41,6 +41,10 @@ function source_thanos_frontend() {
 function source_thanos_ruler() {
     source ./thanos/src/thanos_ruler_install.sh
 }
+function source_alertmanager() {
+    source ./prometheus/src/alertmanager_install.sh
+}
+
 # 主菜单
 function main_menu() {
     while true; do
@@ -51,28 +55,30 @@ function main_menu() {
         echo "0. github代理开关"
         echo "1. 安装prometheus最新release"
         echo "2. 从本地安装prometheus"
-        echo "3. 安装node_exporter最新release"
-        echo "4. 从本地安装node_exporter"
-        echo "5. 安装thanos-sidecar最新release"
-        echo "6. 安装thanos-query最新release"
-        echo "7. 安装thanos-store最新release"
-        echo "8. 安装thanos-compact最新release"
-        echo "9. 安装thanos-frontend最新release"
-        echo "10. 安装thanos-ruler最新release"
-        read -p "请输入选项（0-10）: " OPTION
+        echo "3. 安装alertmanager最新release"
+        echo "4. 安装node_exporter最新release"
+        echo "5. 从本地安装node_exporter"
+        echo "6. 安装thanos-sidecar最新release"
+        echo "7. 安装thanos-query最新release"
+        echo "8. 安装thanos-store最新release"
+        echo "9. 安装thanos-compact最新release"
+        echo "10. 安装thanos-frontend最新release"
+        echo "11. 安装thanos-ruler最新release"
+        read -p "请输入选项（0-11）: " OPTION
 
         case $OPTION in
         0) switch_github_proxy ;;
         1) source_prometheus && install_prometheus ;;
         2) source_prometheus && install_prometheus_local ;;
-        3) source_node_exporter && install_node_exporter ;;
-        4) source_node_exporter && install_node_exporter_local ;;
-        5) source_thanos_sidecar && install_thanos_sidecar ;;
-        6) source_thanos_query && install_thanos_query ;;
-        7) source_thanos_store && install_thanos_store ;;
-        8) source_thanos_compact && install_thanos_compact ;;
-        9) source_thanos_frontend && install_thanos_frontend ;;
-        10) source_thanos_ruler && install_thanos_ruler ;;
+        3) source_alertmanager && install_alertmanager ;;
+        4) source_node_exporter && install_node_exporter ;;
+        5) source_node_exporter && install_node_exporter_local ;;
+        6) source_thanos_sidecar && install_thanos_sidecar ;;
+        7) source_thanos_query && install_thanos_query ;;
+        8) source_thanos_store && install_thanos_store ;;
+        9) source_thanos_compact && install_thanos_compact ;;
+        10) source_thanos_frontend && install_thanos_frontend ;;
+        11) source_thanos_ruler && install_thanos_ruler ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
