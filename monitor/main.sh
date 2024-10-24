@@ -38,6 +38,9 @@ function source_thanos_compact() {
 function source_thanos_frontend() {
     source ./thanos/src/thanos_frontend_install.sh
 }
+function source_thanos_ruler() {
+    source ./thanos/src/thanos_ruler_install.sh
+}
 # 主菜单
 function main_menu() {
     while true; do
@@ -55,6 +58,7 @@ function main_menu() {
         echo "7. 安装thanos-store最新release"
         echo "8. 安装thanos-compact最新release"
         echo "9. 安装thanos-frontend最新release"
+        echo "10. 安装thanos-ruler最新release"
         read -p "请输入选项（0-9）: " OPTION
 
         case $OPTION in
@@ -68,6 +72,7 @@ function main_menu() {
         7) source_thanos_store && install_thanos_store ;;
         8) source_thanos_compact && install_thanos_compact ;;
         9) source_thanos_frontend && install_thanos_frontend ;;
+        10) source_thanos_ruler && install_thanos_ruler ;;
         *) echo "无效选项。" ;;
         esac
         echo "按任意键返回主菜单..."
