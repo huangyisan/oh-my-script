@@ -33,7 +33,7 @@
           meta:
             project: "operator"
           checks:
-            - http: "http://{{ node_exporter_scrape_ip }}:9100/metrics"
+            - http: "http://{{ health_check_ip }}:9100/metrics"
               interval: "10s"
               timeout: "5s"
 
