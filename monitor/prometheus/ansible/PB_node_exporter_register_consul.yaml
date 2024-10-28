@@ -1,15 +1,13 @@
 # playbook register node_exporter to consul
-# ansible-playbook  register_consul.yaml  -e "host_group=suzhou" -e "consul_server=61.155.137.69" -e "CONSUL_HTTP_TOKEN=${CONSUL_HTTP_TOKEN}" -e "manual_specific_lan_ip=10.11.12.12" --limit 180.97.153.252
+# ansible-playbook  register_consul.yaml  -e "host_group=suzhou" -e "consul_server=61.155.137.69" -e "CONSUL_HTTP_TOKEN=${CONSUL_HTTP_TOKEN}" --limit 10.10.10.1
 - # hosts 通过指定变量传入
   hosts: "{{ host_group }}"
   tasks:
-    - name: 获取网卡 eno2 的 IP 地址
-      setup:
-        gather_subset:
-          - network
-
-    - set_fact:
-        eno2_ip_address: "{{ lookup('vars', 'manual_specific_lan_ip') if lookup('vars', 'manual_specific_lan_ip') is defined else ansible_facts.eno2.ipv4.address }}"
+    - name: 判断是否设置node_exporter_scrape_ip变量
+      assert:
+        that:
+          - node_exporter_scrape_ip is defined
+      failed_when: node_exporter_scrape_ip is not defined
 
     - name: 宿主机上发送curl
       delegate_to: localhost
@@ -21,15 +19,15 @@
         headers:
           X-Consul-Token: "{{ CONSUL_HTTP_TOKEN }}"
         body:
-          id: "node_exporter-{{ eno2_ip_address }}"
-          name: "node_exporter-{{ eno2_ip_address }}"
+          id: "node_exporter-{{ node_exporter_scrape_ip }}"
+          name: "node_exporter-{{ node_exporter_scrape_ip }}"
           tags: ["node_exporter"]
-          address: "{{ eno2_ip_address }}"
+          address: "{{ node_exporter_scrape_ip }}"
           port: 9100
           meta:
             project: "operator"
           checks:
-            - http: "http://{{ eno2_ip_address }}:9100/metrics"
+            - http: "http://{{ node_exporter_scrape_ip }}:9100/metrics"
               interval: "10s"
               timeout: "5s"
 
