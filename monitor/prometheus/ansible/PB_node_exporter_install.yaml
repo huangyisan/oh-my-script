@@ -9,6 +9,12 @@
     node_exporter_port: 9100
 
   tasks:
+    - name: 判断是否设置node_exporter_ip变量
+      assert:
+        that:
+          - node_exporter_listen_ip is defined
+      failed_when: node_exporter_listen_ip is not defined
+
     - name: create user
       user:
         name: "{{ exec_user }}"
@@ -53,14 +59,6 @@
         msg: "node_exporter 已成功移动到 /usr/local/sbin"
       when: node_exporter_stat.stat.exists
 
-    - name: 获取网卡 eno2 的 IP 地址
-      setup:
-        gather_subset:
-          - network
-
-    - set_fact:
-      eno2_ip_address: "{{ ansible_facts.eno2.ipv4.address }}"
-
     - name: 配置 systemd 启动文件
       copy:
         dest: /etc/systemd/system/node-exporter-new.service
@@ -81,7 +79,7 @@
               --collector.sysctl \
               --collector.systemd \
               --collector.tcpstat \
-              --web.listen-address={{ eno2_ip_address }}:{{ node_exporter_port }}
+              --web.listen-address={{ node_exporter_listen_ip }}:{{ node_exporter_port }}
 
           ExecReload=/bin/kill -HUP $MAINPID
           TimeoutStopSec=10s
