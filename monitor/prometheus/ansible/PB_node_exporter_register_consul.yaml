@@ -19,7 +19,7 @@
       assert:
         that:
           - health_check_ip is defined
-      failed_when: health_check_ip is not define
+      failed_when: health_check_ip is not defined
 
     - name: 宿主机上发送curl
       delegate_to: localhost
