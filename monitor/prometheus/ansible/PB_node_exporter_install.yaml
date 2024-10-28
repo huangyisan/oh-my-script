@@ -9,7 +9,7 @@
     node_exporter_port: 9100
 
   tasks:
-    - name: 判断是否设置node_exporter_ip变量
+    - name: 判断是否设置node_exporter_listen_ip变量
       assert:
         that:
           - node_exporter_listen_ip is defined
