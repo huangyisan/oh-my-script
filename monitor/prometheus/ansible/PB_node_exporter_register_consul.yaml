@@ -15,6 +15,12 @@
           - consul_server is defined
       failed_when: consul_server is not defined
 
+    - name: 判断是否设置health_check_ip变量
+      assert:
+        that:
+          - health_check_ip is defined
+      failed_when: health_check_ip is not define
+
     - name: 宿主机上发送curl
       delegate_to: localhost
       register: result
