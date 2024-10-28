@@ -9,6 +9,12 @@
           - node_exporter_scrape_ip is defined
       failed_when: node_exporter_scrape_ip is not defined
 
+    - name: 判断是否设置consul_server变量
+      assert:
+        that:
+          - consul_server is defined
+      failed_when: consul_server is not defined
+
     - name: 宿主机上发送curl
       delegate_to: localhost
       register: result
